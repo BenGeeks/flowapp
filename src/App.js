@@ -5,13 +5,18 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import LayoutIcon from '@material-ui/icons/ViewQuilt';
-import MoreIcon from '@material-ui/icons/More';
 import RaiseHandIcon from '@material-ui/icons/PanTool';
-import PersonPinIcon from '@material-ui/icons/PersonPin';
 import PrivateMessage from '@material-ui/icons/Textsms';
 import SetAsPresenter from '@material-ui/icons/RecordVoiceOver';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
+import ScreenShareIcon from '@material-ui/icons/Computer';
+import VideocamIcon from '@material-ui/icons/Videocam';
+import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import ReactTooltip from 'react-tooltip';
+import SettingsIcon from '@material-ui/icons/Settings';
 import './App.css';
 
 function App() {
@@ -105,12 +110,19 @@ function App() {
       view: true,
     },
   ]);
+  const myDesktop =
+    'https://img.gadgethacks.com/img/26/28/63485989830592/0/organize-your-cluttered-mac-desktop-with-desktop-groups-clean-fence-like-folders.w1456.jpg';
   const [presenting, setPresenting] = useState(`${attendees[0].name}`);
   const [chat, setChat] = useState(false);
   const [layoutSetting, setLayoutSetting] = useState(false);
   const [showHand, setShowHand] = useState(false);
   const [thumbsUp, setThumbsUp] = useState(false);
   const [thumbsDown, setThumbsDown] = useState(false);
+  const [camera, setCamera] = useState(true);
+  const [mic, setMic] = useState(true);
+  const [screenShare, setScreenShare] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [settings, setSettings] = useState(false);
 
   const raiseHand = () => {
     setShowHand(true);
@@ -168,6 +180,26 @@ function App() {
     setLayoutSetting(false);
   };
 
+  const getFullScreenElement = () => {
+    return (
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      document.mozFullscreenElement ||
+      document.msFullscreenElement
+    );
+  };
+
+  const handleFullscreen = () => {
+    if (getFullScreenElement()) {
+      document.exitFullscreen();
+      setFullscreen(false);
+    } else {
+      document.documentElement.requestFullscreen().catch((e) => console.log(e));
+      setFullscreen(true);
+    }
+    console.log(getFullScreenElement());
+  };
+
   return (
     <div className="App">
       <Modal show={chat} onHide={() => setChat(false)} centered>
@@ -180,6 +212,14 @@ function App() {
             <input type="text" id="fname" className="chat-entry" autofocus />
             <button className="btn btn-success py-0 mb-1">Submit</button>
           </form>
+        </Modal.Body>
+      </Modal>
+      <Modal show={settings} onHide={() => setSettings(false)} centered>
+        <Modal.Header>
+          <Modal.Title id="contained-modal-title-vcenter">Room Settings</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="">
+          <p>Room settings goes here</p>
         </Modal.Body>
       </Modal>
       <Modal show={layoutSetting} onHide={() => setLayoutSetting(false)} centered>
@@ -212,23 +252,129 @@ function App() {
           width="100"
           className="logo"
         />
-        <LayoutIcon className="side-icons" onClick={() => setLayoutSetting(true)} />
+        <div className="subheader">Presenter</div>
+        <LayoutIcon className="side-icons" data-tip data-for="test" onClick={() => setLayoutSetting(true)} />
+        <ReactTooltip id="test" type="light" effect="solid">
+          <span>Change the layout depending on the number of attendees. Click to test.</span>
+        </ReactTooltip>
         <br />
-        <MicIcon className="side-icons" onClick={unMuteAll} />
+        <MicIcon className="side-icons" data-tip data-for="unMuteAll" onClick={unMuteAll} />
+        <ReactTooltip id="unMuteAll" type="light" effect="solid">
+          <span>Unmute all attendees' microphone. Click to test.</span>
+        </ReactTooltip>
         <br />
-        <MicOffIcon className="side-icons" onClick={muteAll} />
+        <MicOffIcon className="side-icons" data-tip data-for="muteAll" onClick={muteAll} />
+        <ReactTooltip id="muteAll" type="light" effect="solid">
+          <span>Mute all attendees' microphone. Click to test.</span>
+        </ReactTooltip>
         <br />
-        <VisibilityIcon className="side-icons" onClick={unBlockAll} />
+        <VisibilityIcon className="side-icons" data-tip data-for="allowAllCam" onClick={unBlockAll} />
+        <ReactTooltip id="allowAllCam" type="light" effect="solid">
+          <span>Broadcast all attendees' camera. Click to test. </span>
+        </ReactTooltip>
         <br />
-        <VisibilityOffIcon className="side-icons" onClick={blockAll} />
+        <VisibilityOffIcon className="side-icons" data-tip data-for="blockAllCam" onClick={blockAll} />
+        <ReactTooltip id="blockAllCam" type="light" effect="solid">
+          <span>Block all attendees' camera. Click to test. </span>
+        </ReactTooltip>
         <br />
-        <PrivateMessage className="side-icons" onClick={() => setChat('Group Chat')} />
+        <div className="subheader">Attendee</div>
+        {fullscreen ? (
+          <FullscreenExitIcon className="side-icons" data-tip data-for="toggleFullscreen" onClick={handleFullscreen} />
+        ) : (
+          <FullscreenIcon className="side-icons" data-tip data-for="toggleFullscreen" onClick={handleFullscreen} />
+        )}
+        <ReactTooltip id="toggleFullscreen" type="light" effect="solid">
+          <span>Click to toggle fullscreen mode. </span>
+        </ReactTooltip>
         <br />
-        <RaiseHandIcon className="side-icons" onClick={raiseHand} />
+        <PrivateMessage
+          className="side-icons"
+          data-tip
+          data-for="openGeneralChat"
+          onClick={() => setChat('Group Chat')}
+        />
+        <ReactTooltip id="openGeneralChat" type="light" effect="solid">
+          <span>Click to open the general chat. </span>
+        </ReactTooltip>
         <br />
-        <ThumbUpIcon className="side-icons" onClick={handleThumbsUp} />
+        <RaiseHandIcon className="side-icons" data-tip data-for="raiseHand" onClick={raiseHand} />
+        <ReactTooltip id="raiseHand" type="light" effect="solid">
+          <span>Click to raise your hand.</span>
+        </ReactTooltip>
         <br />
-        <ThumbDownIcon className="side-icons" onClick={handleThumbsDown} />
+        <ThumbUpIcon className="side-icons" data-tip data-for="thumbsUp" onClick={handleThumbsUp} />
+        <ReactTooltip id="thumbsUp" type="light" effect="solid">
+          <span>Send the presenter a thumbsUp. </span>
+        </ReactTooltip>
+        <br />
+        <ThumbDownIcon className="side-icons" data-tip data-for="thumbsDown" onClick={handleThumbsDown} />
+        <ReactTooltip id="thumbsDown" type="light" effect="solid">
+          <span>Send the presenter a thumbsDown.</span>
+        </ReactTooltip>
+        <br />
+        <div className="side-icons-container" data-tip data-for="mute">
+          {mic ? (
+            <MicIcon
+              className="side-icons"
+              onClick={() => {
+                setAttendees((attendees) => [...attendees, (attendees[1].mic = false)]);
+                setMic(false);
+              }}
+            />
+          ) : (
+            <MicOffIcon
+              className="side-icons"
+              onClick={() => {
+                setMic(true);
+                setAttendees((attendees) => [...attendees, (attendees[1].mic = true)]);
+              }}
+              style={{ color: 'red' }}
+            />
+          )}
+          <ReactTooltip id="mute" type="light" effect="solid">
+            <span>Click to toggle your mic on and off.</span>
+          </ReactTooltip>
+        </div>
+        <div className="side-icons-container" data-tip data-for="camOff">
+          {camera ? (
+            <VideocamIcon
+              className="side-icons"
+              onClick={() => {
+                setCamera(false);
+                setAttendees((attendees) => [...attendees, (attendees[1].view = false)]);
+              }}
+            />
+          ) : (
+            <VideocamOffIcon
+              className="side-icons"
+              onClick={() => {
+                setCamera(true);
+                setAttendees((attendees) => [...attendees, (attendees[1].view = true)]);
+              }}
+              style={{ color: 'red' }}
+            />
+          )}
+          <ReactTooltip id="camOff" type="light" effect="solid">
+            <span>Click to toggle your camera on and off.</span>
+          </ReactTooltip>
+        </div>
+
+        <ScreenShareIcon
+          data-tip
+          data-for="screenShare"
+          className="side-icons"
+          onClick={() => setScreenShare(!screenShare)}
+          style={screenShare ? { color: 'blue' } : {}}
+        />
+        <ReactTooltip id="screenShare" type="light" effect="solid">
+          <span>Click to toggle screen sharing on and off.</span>
+        </ReactTooltip>
+        <br />
+        <SettingsIcon className="side-icons" data-tip data-for="settings" onClick={() => setSettings(true)} />
+        <ReactTooltip id="settings" type="light" effect="solid">
+          <span>Click to open the room settings window.</span>
+        </ReactTooltip>
       </div>
       <div className="grid-container">
         {attendees.map((attendee, index) => (
@@ -244,7 +390,7 @@ function App() {
               <ThumbDownIcon className="icon-popup" style={{ color: 'red' }} />
             ) : null}
             <img
-              src={attendee.image}
+              src={screenShare && attendee.name === 'Tom' ? myDesktop : attendee.image}
               alt={attendee.name}
               className={presenting === attendee.name ? 'image-presenting' : 'image'}
             ></img>
@@ -253,32 +399,57 @@ function App() {
               <div className="icons">
                 {attendee.mic ? (
                   <MicIcon
+                    data-tip
+                    data-for="inividualMic"
                     className="hover"
                     onClick={() => setAttendees((attendees) => [...attendees, (attendees[index].mic = false)])}
                   />
                 ) : (
                   <MicOffIcon
+                    data-tip
+                    data-for="inividualMic"
                     className="hover"
                     onClick={() => setAttendees((attendees) => [...attendees, (attendees[index].mic = true)])}
                     style={{ color: 'red' }}
                   />
                 )}
+                <ReactTooltip id="inividualMic" type="light" effect="solid">
+                  <span>Toggle to mute or unmute this attendee.</span>
+                </ReactTooltip>
                 {attendee.view ? (
                   <VisibilityIcon
+                    data-tip
+                    data-for="inividualView"
                     className="hover"
                     onClick={() => setAttendees((attendees) => [...attendees, (attendees[index].view = false)])}
                   />
                 ) : (
                   <VisibilityOffIcon
+                    data-tip
+                    data-for="inividualView"
                     className="hover"
                     onClick={() => setAttendees((attendees) => [...attendees, (attendees[index].view = true)])}
                     style={{ color: 'red' }}
                   />
                 )}
-                <PrivateMessage className="hover" onClick={() => setChat(attendee.name)} />
+                <ReactTooltip id="inividualView" type="light" effect="solid">
+                  <span>Toggle to block or unblock this attendee's camera.</span>
+                </ReactTooltip>
+                <PrivateMessage className="hover" data-tip data-for="pm" onClick={() => setChat(attendee.name)} />
+                <ReactTooltip id="pm" type="light" effect="solid">
+                  <span>Click to open the private chat window.</span>
+                </ReactTooltip>
                 {presenting !== attendee.name && (
-                  <SetAsPresenter className="hover" onClick={() => setPresenting(attendee.name)} />
+                  <SetAsPresenter
+                    className="hover"
+                    data-tip
+                    data-for="presenter"
+                    onClick={() => setPresenting(attendee.name)}
+                  />
                 )}
+                <ReactTooltip id="presenter" type="light" effect="solid">
+                  <span>Set this attendee as the presenter.</span>
+                </ReactTooltip>
               </div>
             </div>
           </div>
